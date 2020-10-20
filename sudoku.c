@@ -11,6 +11,7 @@ int to_int (char* symbols, int* numbers);
 int sud_get (const char* path, char* buffer);
 int determine (int cord);
 int check_horiz (int* sudoku, int y, int cands [81] [9], const char type); 
+int check_verti (int* sudoku, int x, int cands [81] [9], const char type); 
 int check_moves (int* sudoku, int cands [81] [9], const char type, int* UTM); //Unable To Move
  
 const int FILE_SIZE =  150;
@@ -45,9 +46,6 @@ int main () {
         
 /*      if (where_put == NOWHERE)
             where_put = check_moves (sudoku, cands, "triple");  
-
-        if (everything_filled (sudoku))
-            break;
 */
         if (where_put != NOWHERE) { 
             print_sudoku (sudoku, step++);
@@ -163,16 +161,14 @@ int determine (int cord) {
 }
 
 int check_moves (int* sudoku, int cands [81] [9], const char type, int* UTM) {
-    for (int i = 0; i < 81; ++i) {
-        int x = i % 9;
-        int y = (i - x) / 9;
+    for (int i = 0; i < 9; ++i) {
         int where_put = NOWHERE;
         
         if (where_put == NOWHERE)
-            where_put = check_horiz (sudoku,    y, cands, type);
-/*      if (where_put == NOWHERE)
-            where_put = check_verti (sudoku, x,    cands, type);
+            where_put = check_horiz (sudoku,    i, cands, type);
         if (where_put == NOWHERE)
+            where_put = check_verti (sudoku, i,    cands, type);
+/*      if (where_put == NOWHERE)
             where_put = check_3x3   (sudoku, x, y, cands, type);
 */
         if (where_put != NOWHERE) 
@@ -220,6 +216,61 @@ int check_horiz (int* sudoku, int y, int cands [81] [9], const char type) {
             if (counter == 1) {
                 where_put = 9 * y + putX;
                 sudoku [9 * y + putX] = i + 1;
+                break;
+            }   
+        }                    
+        break;
+    case 'p': //pair
+
+        break;
+    case 't': //triple
+        
+        break;
+    default:
+        printf ("WRONG ARG TO CHECK FUNC");
+        return -2;
+        break;
+    }
+    return where_put;
+}
+
+int check_verti (int* sudoku, int x, int cands [81] [9], const char type) {
+    int where_put = NOWHERE;
+    int counter = 0;
+    int putY = 555;
+    int putNum = 888;
+    switch (type) {
+    case 'o': //obvious
+        for (int y = 0; y < 9; ++y) {
+            counter = 0;
+            putNum = 0;
+            for (int i = 0; i < 9; ++i)
+                if (sudoku [9 * y + x]     == 0 &&
+                    cands  [9 * y + x] [i] == i + 1) {
+                    ++counter;
+                    putNum = i;
+                }
+            if (counter == 1) {
+                where_put = 9 * y + x;
+                sudoku [9 * y + x] = putNum  + 1;
+                break;
+            } 
+        }
+        break;
+    case 's': //single
+        for (int i = 0; i < 9; ++i) {
+            counter = 0;
+            putY = 0;
+            for (int y = 0; y < 9; ++y) 
+                if (sudoku [9 * y + x]     == 0 &&
+                    cands  [9 * y + x] [i] == i + 1) {
+                    ++counter;
+                    putY = y;
+                }
+            
+            if (counter == 1) {
+                where_put = 9 * putY + x;
+                sudoku [9 * putY + x] = i + 1;
                 break;
             }   
         }                    
